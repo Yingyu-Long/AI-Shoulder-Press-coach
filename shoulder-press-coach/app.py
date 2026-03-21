@@ -1,19 +1,17 @@
 """Main entry point for the shoulder press coaching app."""
 
 from __future__ import annotations
-
 import cv2
+import time
 
 from src.detector.exercise_detector import ShoulderPressDetector
 from src.detector.pose_detector import PoseDetector
-from src.logic.feedback import generate_feedback
 from src.logic.rep_counter import RepCounter
 from src.utils.drawing import (
     draw_angle_label,
     draw_header,
     draw_pose_landmarks,
 )
-
 
 def main() -> None:
     """Start the webcam loop and run the shoulder press coach."""
@@ -32,26 +30,37 @@ def main() -> None:
                 print("Warning: failed to read a frame from the webcam.")
                 break
 
+            current_time = time.time()
             frame = cv2.flip(frame, 1)
             pose_result = pose_detector.process(frame)
 
             metrics = None
-            stage = rep_counter.stage
+            is_correct = True
+            
+            # Default UI state before person enters frame
+            stage = "Unknown"
+            breath = "-"
             rep_count = rep_counter.reps
-            feedback_text = "Get in frame"
+            feedback_text = "Please step into the frame"
 
             if pose_result.landmarks:
                 metrics = exercise_detector.analyze(pose_result.landmarks, frame.shape)
-                stage, rep_count, rep_event = rep_counter.update(metrics)
-                feedback_text = generate_feedback(metrics, stage, rep_event)
-                draw_pose_landmarks(frame, pose_result, pose_detector.pose_connections)
-            else:
-                rep_event = None
+                
+                # The state machine now returns all necessary UI data
+                state = rep_counter.update(metrics, current_time)
+                
+                stage = state.frontend_stage
+                breath = state.breath
+                feedback_text = state.feedback
+                is_correct = state.is_correct
+                rep_count = state.reps
 
-            draw_header(frame, rep_count, stage, feedback_text)
+                draw_pose_landmarks(frame, pose_result, pose_detector.pose_connections, is_correct)
 
-            if metrics and metrics.elbow_point:
-                draw_angle_label(frame, metrics.elbow_point, metrics.elbow_angle)
+            draw_header(frame, rep_count, stage, breath, feedback_text, is_correct)
+
+            if metrics and metrics.visibility_ok:
+                draw_angle_label(frame, metrics.elbow_point, metrics.elbow_angle, is_correct)
 
             cv2.imshow("Shoulder Press Coach", frame)
 
@@ -62,7 +71,6 @@ def main() -> None:
         cap.release()
         cv2.destroyAllWindows()
         pose_detector.close()
-
 
 if __name__ == "__main__":
     main()
