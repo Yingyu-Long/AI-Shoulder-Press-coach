@@ -1,14 +1,18 @@
 """Shoulder press-specific measurement logic."""
 
 from __future__ import annotations
+
 from dataclasses import dataclass
+
 import mediapipe as mp
 
 from src.utils.geometry import Point, angle_between_points, landmark_to_point
 
+
 @dataclass
 class PressMetrics:
     """Computed measurements used for stage detection and feedback."""
+
     elbow_angle: float
     visibility_ok: bool
     is_at_eye_level: bool
@@ -35,18 +39,44 @@ class ShoulderPressDetector:
         shoulder = landmarks[self._pose_landmark.RIGHT_SHOULDER]
         elbow = landmarks[self._pose_landmark.RIGHT_ELBOW]
         wrist = landmarks[self._pose_landmark.RIGHT_WRIST]
-        nose = landmarks[self._pose_landmark.NOSE] # Used for eye-level check
+        nose = landmarks[self._pose_landmark.NOSE]
+        
+        # New: Grab the 3 points of the hand to track the dumbbell handle
+        pinky = landmarks[self._pose_landmark.RIGHT_PINKY]
+        index = landmarks[self._pose_landmark.RIGHT_INDEX]
+        thumb = landmarks[self._pose_landmark.RIGHT_THUMB]
 
         shoulder_point = landmark_to_point(shoulder, width, height)
         elbow_point = landmark_to_point(elbow, width, height)
         wrist_point = landmark_to_point(wrist, width, height)
         nose_point = landmark_to_point(nose, width, height)
+        
+        pinky_point = landmark_to_point(pinky, width, height)
+        index_point = landmark_to_point(index, width, height)
+        thumb_point = landmark_to_point(thumb, width, height)
 
         elbow_angle = angle_between_points(shoulder_point, elbow_point, wrist_point)
-        visibility_ok = min(shoulder.visibility, elbow.visibility, wrist.visibility, nose.visibility) > 0.5
+        
+        # Ensure the hand is also visible
+        visibility_ok = min(
+            shoulder.visibility, elbow.visibility, wrist.visibility, 
+            nose.visibility, pinky.visibility, index.visibility, thumb.visibility
+        ) > 0.5
 
-        # Eye level heuristic: Wrist is roughly at the same height as the nose/eyes
-        is_at_eye_level = abs(wrist_point.y - nose_point.y) < (height * 0.15)
+        # Calculate the center of the grip by averaging the 3 hand points
+        hand_center_y = (pinky_point.y + index_point.y + thumb_point.y) / 3.0
+        
+        # Find the highest point of the hand (minimum y value in image coordinates)
+        # This guarantees no part of your hand triggers it while still above your head
+        highest_hand_y = min(pinky_point.y, index_point.y, thumb_point.y)
+
+        # Eye level heuristic: The hand center must be near the nose, AND 
+        # the top of the hand must be pushed down into the zone.
+        # Tightened the margin to 10% of frame height to prevent early triggers.
+        is_at_eye_level = (
+            abs(hand_center_y - nose_point.y) < (height * 0.10) and 
+            highest_hand_y > (nose_point.y - height * 0.12)
+        )
         
         # Flaring heuristic: The wrist and elbow should be vertically aligned. 
         # If the horizontal distance is too large, the elbow is flaring out.

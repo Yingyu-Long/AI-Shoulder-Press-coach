@@ -24,7 +24,7 @@ class RepCounter:
         self.bottom_hold_start = None
         self.top_hold_start = None
         
-        # Flag to unlock the press stage after the 2.0s hold
+        # Flag to unlock the press stage after the hold
         self.ready_to_press = False 
         
         self.max_up_angle = 0.0
@@ -52,18 +52,21 @@ class RepCounter:
         # 4. State Machine Logic
         if self.backend_stage == "BOTTOM":
             
+            # DYNAMIC TIMER: 2s for the first rep (reps == 0), 1s for all others
+            required_hold_time = 2.0 if self.reps == 0 else 1.0
+            
             # A. Check if they are in the correct starting position
             if metrics.is_at_eye_level and not metrics.is_flaring:
                 if self.bottom_hold_start is None:
                     self.bottom_hold_start = current_time
                     frontend_stage = "Hold" 
-                elif current_time - self.bottom_hold_start >= 2.0: 
+                elif current_time - self.bottom_hold_start >= required_hold_time: 
                     self.ready_to_press = True
                     feedback = "Good hold! Press up." 
                     frontend_stage = "Press"
                     breath = "Exhale"
                 else:
-                    frontend_stage = "Hold" # Keep showing Hold during the 2.0s wait
+                    frontend_stage = "Hold" # Keep showing Hold during the wait
             else:
                 # B. Not at eye level. 
                 if self.ready_to_press:
