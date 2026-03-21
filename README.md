@@ -1,2 +1,2 @@
 # Procrastination-Detector
-A computer vision–based focus tracker that uses webcam input to detect user attention in real time. It estimates focus levels by analyzing face presence and head orientation, providing a focus score and session insights.
+A computer vision–based app that uses webcam input to detect when users are distracted and delivers real-time AI-generated roast warnings to keep them on track.
