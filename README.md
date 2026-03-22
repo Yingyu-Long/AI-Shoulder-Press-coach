@@ -1,90 +1,33 @@
-# Shoulder Press Coach
+# 🏋️‍♂️ AI Personal Trainer (Exercise Coach)
 
-Desktop webcam app for tracking a right-arm shoulder press with live feedback, rep counting, and a simple completion animation.
+An intelligent, real-time webcam exercise coach powered by Computer Vision. This application acts as your personal virtual trainer—counting your reps, analyzing your form, and providing visual corrections on the fly to ensure you get a safe and effective workout.
 
-## What It Does
+Currently, the trainer specializes in the **Shoulder Press**, featuring a modular architecture designed to support many more exercises in the future.
 
-- Uses your webcam for live pose tracking
-- Detects the right shoulder, elbow, wrist, nose, and hand landmarks with MediaPipe Pose
-- Counts reps with a stage-based state machine
-- Shows live coaching feedback on screen
-- Prompts for today's rep goal before the session starts
-- Plays a short completion animation when the goal is reached
-- Lets the user reset the workout by pressing `R`
+---
 
-## Current Coaching Rules
+## ✨ Features
 
-- `Elbow is too tight` if elbow angle is below `40`
-- `Don't Flare your Elbows Out` during the press stage if elbow angle goes above `140`
-- `Bring dumbbells to eye level` if the start position is not reached
-- `Hold it at the top...` and `Don't drop yet! Hold for 1 second.` for the top hold
-- `Fully extend your arms!` if the press takes too long
+* **Real-Time Rep Tracking:** Automatically counts reps using a strict state-machine that tracks the bottom, pressing, top, and descending phases of your movement.
+* **Strict Form Coaching:** It doesn't just count; it judges. The app enforces:
+  * Proper starting depth (dumbbells at eye level).
+  * Full arm extension at the top.
+  * Isometric holds (pausing at the top and bottom of the movement).
+  * Hand convergence (bringing hands closer together during the press).
+* **Visual Posture Correction:** If you break form (e.g., flaring your elbows out too far), the app draws corrective visual cues—like a red "TUCK IN" arrow—directly on your joints to show you exactly how to fix it.
+* **Dynamic HUD & Breathing Cues:** On-screen prompts guide your breathing (Inhale on the way down, Exhale on the push) and display your current stage in real-time.
+* **Custom Workout Goals:** Set your target reps before you start. Hitting your goal triggers a custom celebration animation!
+* **Quick Reset:** Press `R` at any time to reset your current set without restarting the app.
 
-## Project Structure
+---
 
-```text
-shoulder-press-coach/
-  app.py
-  requirements.txt
-  README.md
-  src/
-    config.py
-    detector/
-      pose_detector.py
-      exercise_detector.py
-    logic/
-      rep_counter.py
-    utils/
-      drawing.py
-      geometry.py
-```
+## 🛠️ Installation & Setup
 
-## Requirements
+### Prerequisites
+* Python 3.8+
+* A working webcam
 
-- Python 3.10+
-- Webcam access
-
-Dependencies:
-
-- `mediapipe==0.10.14`
-- `opencv-python==4.10.0.84`
-- `numpy==1.26.4`
-
-## Setup
-
+### 1. Clone the repository
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-## Run
-
-```bash
-python app.py
-```
-
-When the app starts, it asks:
-
-```text
-How much do you wanna press today? [12]:
-```
-
-Press:
-
-- `R` to reset the rep counter
-- `Q` or `Esc` to quit
-
-## How It Works
-
-1. `app.py` starts the webcam loop and prompts for today's rep goal.
-2. `src/detector/pose_detector.py` runs MediaPipe Pose on each frame.
-3. `src/detector/exercise_detector.py` converts landmarks into shoulder-press metrics such as elbow angle and whether the hand is back at eye level.
-4. `src/logic/rep_counter.py` manages the workout state machine: `BOTTOM -> UP -> TOP -> DOWN`.
-5. `src/utils/drawing.py` renders the HUD, elbow-angle label, pose landmarks, and completion animation.
-
-## Notes
-
-- The app currently supports the right arm only.
-- The rep goal is chosen at runtime, but the default goal lives in `src/config.py`.
-- Thresholds are intentionally simple and can be tuned in `src/logic/rep_counter.py` and `src/detector/exercise_detector.py`.
+git clone [https://github.com/YourUsername/AI_Exercise-Coach.git](https://github.com/YourUsername/AI_Exercise-Coach.git)
+cd AI_Exercise-Coach
