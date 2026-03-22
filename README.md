@@ -30,4 +30,6 @@ Currently, the trainer specializes in the **Shoulder Press**, featuring a modula
 ### 1. Clone the repository
 ```bash
 git clone [https://github.com/YourUsername/AI_Exercise-Coach.git](https://github.com/YourUsername/AI_Exercise-Coach.git)
-cd AI_Exercise-Coach
+cd shoulder-press-coach
+python app.py (for Windows Users)
+python3 app.py (for Mac Users)
