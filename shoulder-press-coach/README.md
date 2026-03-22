@@ -6,7 +6,6 @@ Simple desktop webcam app that detects a shoulder press, counts reps, and shows 
 
 - Uses a local webcam for live video
 - Detects pose landmarks with MediaPipe Pose
-- Tracks a right-arm shoulder press with adjustable thresholds
 - Counts reps using a small state machine
 - Displays rep count, stage, elbow angle, and coaching text
 - Keeps the code modular so it is easy to extend later
@@ -36,14 +35,7 @@ shoulder-press-coach/
 
 ## Setup
 
-1. Create and activate a virtual environment:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-2. Install dependencies:
+1. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
