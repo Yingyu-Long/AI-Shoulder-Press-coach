@@ -1,4 +1,4 @@
-# 🏋️‍♂️ AI Personal Trainer (Exercise Coach)
+# Personal Trainer (Exercise Coach)
 
 An intelligent, real-time webcam exercise coach powered by Computer Vision. This application acts as your personal virtual trainer—counting your reps, analyzing your form, and providing visual corrections on the fly to ensure you get a safe and effective workout.
 
@@ -6,7 +6,7 @@ Currently, the trainer specializes in the **Shoulder Press**, featuring a modula
 
 ---
 
-## ✨ Features
+## Features
 
 * **Real-Time Rep Tracking:** Automatically counts reps using a strict state-machine that tracks the bottom, pressing, top, and descending phases of your movement.
 * **Strict Form Coaching:** It doesn't just count; it judges. The app enforces:
@@ -21,7 +21,7 @@ Currently, the trainer specializes in the **Shoulder Press**, featuring a modula
 
 ---
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 * Python 3.8+
