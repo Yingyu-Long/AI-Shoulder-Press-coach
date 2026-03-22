@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
+from src.config import DEFAULT_REP_GOAL
 from src.detector.exercise_detector import PressMetrics
 
 @dataclass
@@ -15,8 +16,9 @@ class CoachingState:
 class RepCounter:
     """Track reps using strict timing and angle tolerances."""
 
-    def __init__(self):
+    def __init__(self, rep_goal: int = DEFAULT_REP_GOAL):
         self.reps = 0
+        self.rep_goal = rep_goal
         self.backend_stage = "BOTTOM" 
         self.state_entry_time = 0.0
         
@@ -31,12 +33,17 @@ class RepCounter:
         self.min_down_angle = 360.0
 
     def update(self, metrics: PressMetrics, current_time: float) -> CoachingState:
+        if self.reps >= self.rep_goal:
+            return CoachingState(
+                frontend_stage="Relax", 
+                breath="-", 
+                feedback="Goal Reached! Great job.", 
+                is_correct=True, 
+                reps=self.reps
+            )
+        
         if not metrics.visibility_ok:
             return CoachingState("Unknown", "-", "Please step into the frame", False, self.reps)
-
-        # 1. Check for workout completion
-        if self.reps >= 12:
-            return CoachingState("Relax", "Breathe", "Workout Complete! Great job.", True, self.reps)
 
         # 2. Set defaults for a "Good" frame
         is_correct = True
@@ -146,5 +153,8 @@ class RepCounter:
         # Override feedback if global flaring was detected above
         if not is_correct and metrics.is_flaring:
             feedback = "Don't Flare your Elbows Out"
+
+        if self.reps >= self.rep_goal and is_correct:
+            feedback = f"Goal {self.rep_goal} Reached! Keep going!"
 
         return CoachingState(frontend_stage, breath, feedback, is_correct, self.reps)

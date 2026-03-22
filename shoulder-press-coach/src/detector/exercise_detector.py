@@ -21,6 +21,7 @@ class PressMetrics:
     elbow_point: Point
     wrist_point: Point
     nose_point: Point
+    flare_error_px: int = 0
 
 
 class ShoulderPressDetector:
@@ -78,15 +79,21 @@ class ShoulderPressDetector:
             highest_hand_y > (nose_point.y - height * 0.12)
         )
         
-        # Flaring heuristic: The wrist and elbow should be vertically aligned. 
-        # If the horizontal distance is too large, the elbow is flaring out.
-        is_flaring = abs(wrist_point.x - elbow_point.x) > (width * 0.12)
+        # Refined Flaring Logic: 
+        # In a good press, the elbow should stay roughly under the wrist.
+        # Calculate the horizontal distance between wrist and elbow
+        horizontal_gap = abs(wrist_point.x - elbow_point.x)
+        flare_threshold = width * 0.12
+    
+        is_flaring = horizontal_gap > flare_threshold
+        flare_error_px = int(horizontal_gap - flare_threshold) if is_flaring else 0
 
         return PressMetrics(
             elbow_angle=elbow_angle,
             visibility_ok=visibility_ok,
             is_at_eye_level=is_at_eye_level,
             is_flaring=is_flaring,
+            flare_error_px=flare_error_px,
             shoulder_point=shoulder_point,
             elbow_point=elbow_point,
             wrist_point=wrist_point,
