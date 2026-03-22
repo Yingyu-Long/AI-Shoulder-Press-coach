@@ -48,9 +48,3 @@ python app.py
 ```
 
 Press `q` or `Esc` to close the app.
-
-## Notes
-
-- The MVP uses the right arm only to keep the logic simple.
-- Stage detection combines elbow angle and wrist-vs-shoulder height.
-- Thresholds live in `src/detector/exercise_detector.py` and can be tuned quickly for your demo.
