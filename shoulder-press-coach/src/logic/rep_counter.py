@@ -31,6 +31,17 @@ class RepCounter:
         
         self.max_up_angle = 0.0
         self.min_down_angle = 360.0
+        
+    def reset(self) -> None:
+        """Reset the counter and state machine for a new set."""
+        self.reps = 0
+        self.backend_stage = "BOTTOM"
+        self.state_entry_time = 0.0
+        self.bottom_hold_start = None
+        self.top_hold_start = None
+        self.ready_to_press = False
+        self.max_up_angle = 0.0
+        self.min_down_angle = 360.0
 
     def update(self, metrics: PressMetrics, current_time: float) -> CoachingState:
         if self.reps >= self.rep_goal:
